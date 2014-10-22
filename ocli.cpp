@@ -106,14 +106,19 @@ float ocl_t::run(std::string& apl_cstr){
 
     std::cout << "Sim ...\r";
     if (err == CL_SUCCESS) {
-        err = clEnqueueReadBuffer(queue, cl_res, CL_TRUE, 0, sizeof(float)* iterations, &res[0], 0, 0, 0);
-        ret = prefix_mean(res, iterations);
+        err = clEnqueueReadBuffer(queue, cl_res, CL_TRUE, 0, sizeof(float) * iterations, &res[0], 0, 0, 0);
+        if (err != CL_SUCCESS){
+            printf("Can't read back data %d\n", err);
+            ret = -1.0;
+        }else{
+            ret = prefix_mean(res, iterations);
+            std::cout << "       \r";
+        }
     }
     else{
-        std::cerr << "Can't run kernel or read back data\n";
+        printf("Can't run kernel %d\n", err);
         ret = -1.0;
     }
-    std::cout << "       \r";
     delete[] res;
     clReleaseKernel(sim_iterate);
     clReleaseProgram(program);
