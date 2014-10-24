@@ -120,16 +120,16 @@ public:
 };
 
 class actionnode_t{
-private:
+public:
     int action;
     cond_t cond;
     actionnode_t* next;
-public:
     actionnode_t(int _action) : action(_action){};
     int complexity();
     int length();
     void addition();
     void deletion();
+    void alternate();
     void chiasma(actionnode_t** mate);
     void condmutation();
     void condchiasma(actionnode_t** mate);

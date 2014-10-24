@@ -4,7 +4,7 @@ struct lelem_t{
     apl_t* apl;
     float dps;
     int complexity;
-} list[130];
+} list[270];
 
 float eval(int idx){
     std::string str;
@@ -97,7 +97,7 @@ int main(){
     FILE* fbest = fopen("best.txt", "wb");
     
     /* init genetic. */
-    for (i = 0; i < 100; i++){
+    for (i = 0; i < 200; i++){
         list[i].apl = new apl_t;
         list[i].dps = eval(i);
         while (list[i].dps <= .0){
@@ -107,13 +107,13 @@ int main(){
     }
     while (1){
         /* chiasma */
-        for (i = 100; i < 120; i+=2){
+        for (i = 200; i < 240; i+=2){
             int j = i + 1;
-            int m1 = static_cast<int>(100 * uni_rng());
-            int m1r = static_cast<int>(100 * uni_rng());
+            int m1 = static_cast<int>(200 * uni_rng());
+            int m1r = static_cast<int>(200 * uni_rng());
             m1 = m1 < m1r ? m1 : m1r;
-            int m2 = static_cast<int>(100 * uni_rng());
-            int m2r = static_cast<int>(100 * uni_rng());
+            int m2 = static_cast<int>(200 * uni_rng());
+            int m2r = static_cast<int>(200 * uni_rng());
             m2 = m2 < m2r ? m2 : m2r;
 
             list[i].apl = new apl_t(*list[m1].apl);
@@ -121,31 +121,40 @@ int main(){
             list[i].apl->chiasma(*list[j].apl);
         }
         /* mutation */
-        for (i = 120; i < 130; i++){
-            int m = static_cast<int>(100 * uni_rng());
-            int mr = static_cast<int>(100 * uni_rng());
+        for (i = 240; i < 260; i++){
+            int m = static_cast<int>(200 * uni_rng());
+            int mr = static_cast<int>(200 * uni_rng());
+            m = m < mr ? m : mr;
+
+            list[i].apl = new apl_t(*list[m].apl);
+            list[i].apl->mutation();
+        }
+        /* double mutation */
+        for (i = 260; i < 270; i++){
+            int m = static_cast<int>(200 + 60 * uni_rng());
+            int mr = static_cast<int>(200 + 60 * uni_rng());
             m = m < mr ? m : mr;
 
             list[i].apl = new apl_t(*list[m].apl);
             list[i].apl->mutation();
         }
         /* evaluation */
-        for (i = 100; i < 130; i++){
+        for (i = 200; i < 270; i++){
             list[i].dps = eval(i);
             list[i].complexity = list[i].apl->complexity();
         }
         /* sort */
-        dpssort(0, 129);
+        dpssort(0, 269);
         int j = 0;
-        for (i = 1; i < 130; i++){
+        for (i = 1; i < 270; i++){
             if (list[i].dps != list[j].dps){
                 if (i - j > 1) complexitysort(j, i - 1);
                 j = i;
             }
         }
-        if (j < 100) complexitysort(j, 129);
+        if (j < 200) complexitysort(j, 269);
         /* select */
-        for (i = 100; i < 130; i++){
+        for (i = 200; i < 270; i++){
             list[i].dps = .0;
             delete list[i].apl;
             list[i].apl = nullptr;

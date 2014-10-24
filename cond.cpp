@@ -222,10 +222,10 @@ void condnode_t::deletion(){
 
 void cond_t::mutation(){
     double c = static_cast<double>(complexity());
-    if (uni_rng() < 0.2){
+    if (uni_rng() < 0.33){
         /* alternate */
         if (root) root->alternate();
-    }else if (c > 3.0 * abs(nor_rng())){
+    }else if (c > 4.0 * abs(nor_rng())){
         /* delete */
         if (!root) return;
         if (c <= 1.0){

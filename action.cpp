@@ -34,7 +34,7 @@ int actionnode_t::complexity(){
     return cond.complexity() + 1 + next->complexity();
 }
 void actionnode_t::addition(){
-    if (!next || uni_rng() < 0.25){
+    if (!next || uni_rng() < 0.22){
         actionnode_t* p = new actionnode_t(static_cast<int>(uni_rng() * actionnum));
         p->next = next;
         next = p;
@@ -46,7 +46,7 @@ void actionnode_t::addition(){
 
 void actionnode_t::deletion(){
     if (!next) return;
-    if (!next->next || uni_rng() < 0.25){
+    if (!next->next || uni_rng() < 0.22){
         auto p = next;
         next = next->next;
         delete p;
@@ -56,8 +56,17 @@ void actionnode_t::deletion(){
     }
 }
 
+void actionnode_t::alternate(){
+    if (!next || uni_rng() < 0.22){
+        action = static_cast<int>(actionnum * uni_rng());
+    }
+    else{
+        next->alternate();
+    }
+}
+
 void actionnode_t::condmutation(){
-    if (!next || uni_rng() < 0.25){
+    if (!next || uni_rng() < 0.22){
         cond.mutation();
     }
     else{
@@ -71,15 +80,36 @@ void apl_t::mutation(){
         /* condmutation */
         if (head) head->condmutation();
     }
-    if (c > 3.0 + 4.0 * abs(nor_rng())){
+    if (uni_rng() < 0.3){
+        /* alternate */
+        if (head) head->alternate();
+    }else if (c > 3.0 + 4.0 * abs(nor_rng())){
         /* delete */
         if (!head) return;
-        head->deletion();
+        if (!head->next || uni_rng() < 0.22){
+            auto p = head;
+            head = head->next;
+            delete p;
+        }
+        else{
+            head->deletion();
+        }
     }
     else {
         /* add */
-        if (head) head->addition();
-        else head = new actionnode_t(static_cast<int>(uni_rng() * actionnum));
+        if (head){
+            if (uni_rng() < 0.22){
+                actionnode_t* p = new actionnode_t(static_cast<int>(uni_rng() * actionnum));
+                p->next = head;
+                head = p;
+            }
+            else{
+                head->addition();
+            }
+        }
+        else{
+            head = new actionnode_t(static_cast<int>(uni_rng() * actionnum));
+        }
     }
 };
 
@@ -91,10 +121,10 @@ void actionnode_t::chiasma(actionnode_t** mate){
         next = *mate;
         *mate = p;
     }
-    else if(next && c < 0.125){
+    else if(next && c < 0.11){
         next->chiasma(mate);
     }
-    else if (*mate && c < 0.25){
+    else if (*mate && c < 0.22){
         chiasma(&(*mate)->next);
     }
     else{
@@ -112,10 +142,10 @@ void actionnode_t::condchiasma(actionnode_t** mate){
     else if (!next || !(*mate)->next){
         cond.chiasma((*mate)->cond);
     }
-    else if (next && c < 0.125){
+    else if (next && c < 0.11){
         next->condchiasma(mate);
     }
-    else if (*mate && c < 0.25){
+    else if (*mate && c < 0.22){
         condchiasma(&(*mate)->next);
     }
     else{
